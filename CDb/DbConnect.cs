@@ -43,16 +43,35 @@ namespace CDb
         //Redo to avoid injection
         private void button2_Click(object sender, EventArgs e)
         {
+            //create
             var connection = new MySqlConnection(
                "server=localhost;user id=root;password=;database=csharpmysql;");
             connection.Open();
-            MySqlCommand command = connection.CreateCommand();
-            command.CommandText = "INSERT INTO csharpmysql.test_table(name,age) VALUES(@name, @age)";
-            command.Parameters.AddWithValue("@name", textBox1.Text);
-            command.Parameters.AddWithValue("@age", textBox2.Text);
-            command.ExecuteNonQuery();
+            //MessageBox.Show("Connection Open  !");
+            String sql = "SELECT * FROM csharpmysql.test_table WHERE name=@name";
+            MySqlCommand command = new MySqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@name", Name.Text);
+            MySqlDataReader reader = command.ExecuteReader();
+            if (reader.Read()) //John Smith
+            {
+                if (reader[1].ToString() == Name.Text)
+                {
+                    MessageBox.Show("name exists");
+                }
+                
+            }
+            else
+            {
+                reader.Close();
+                MySqlCommand insert = connection.CreateCommand();
+                insert.CommandText = "INSERT INTO csharpmysql.test_table(name,age) VALUES(@name, @age)";
+                insert.Parameters.AddWithValue("@name", Name.Text);
+                insert.Parameters.AddWithValue("@age", textBox2.Text);
+                insert.ExecuteNonQuery();
+                MessageBox.Show("Created");
+                reader.Close();
+            }
             connection.Close();
-
         }
 
         private void textBox1_TextChanged(object sender, EventArgs e)
@@ -69,7 +88,7 @@ namespace CDb
 
         private void textBox3_TextChanged(object sender, EventArgs e)
         {
-
+            //read
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -88,5 +107,10 @@ namespace CDb
             }
             connection.Close();
         }
-    }//command.CommandText = "SELECT * FROM test_table where id=@id";
+
+        private void label3_Click(object sender, EventArgs e)
+        {
+
+        }
+    }
 }
